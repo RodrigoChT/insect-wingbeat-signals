@@ -3,6 +3,7 @@
 
 
 """
+import argparse
 import queue
 import sys
 import time
@@ -14,23 +15,34 @@ assert np
 
 from matplotlib.animation import FuncAnimation
 
-downsample = 10
-samplerate = 44100
-interval = 20
-window = 200
+# recording parameters (same freq and resolution as original paper)
+samplerate = 8000
 device = 9
 channels = [1]
 subtype = 'PCM_16'
-filename = 'wingbeats ' + time.strftime('%c') + '.wav'
+filename = 'recordings/wingbeats_' + time.strftime('%D__%R').replace('/','_').replace(':','_') + '.wav'
+
+# plot parameters
+downsample = 10
+interval = 20
+window = 200
 
 q = queue.Queue()
+
+# Do not show plot by default
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('-sP', '--showPlot', type = bool, default = False)
+args = parser.parse_args()
 
 def audio_callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
     # Fancy indexing with mapping creates a (necessary!) copy:
-    q.put(indata[::downsample, [c - 1 for c in channels]])
+    if args.showPlot:
+        q.put(indata[::downsample, [c - 1 for c in channels]])
+    else:
+        q.put(indata.copy())
 
 def update_plot(frame):
     """This is called by matplotlib for each plot update.
@@ -52,6 +64,7 @@ def update_plot(frame):
         line.set_ydata(plotdata[:, column])
     return lines
 
+
 try:
     length = int(window * samplerate / (1000 * downsample))
     plotdata = np.zeros((length, len(channels)))
@@ -64,22 +77,29 @@ try:
     ax.tick_params(bottom=False, top=False, labelbottom=False,
                    right=False, left=False, labelleft=False)
     fig.tight_layout(pad=0)
+    ani = FuncAnimation(fig, update_plot, interval=interval, blit=True)
 
-    while True:
-        # Make sure the file is opened before recording anything:
-        with sf.SoundFile(filename, mode='x', samplerate=samplerate,
-                          channels=max(channels), subtype=subtype) as file:
-            with sd.InputStream(samplerate=samplerate,
-                                channels=max(channels), callback=audio_callback):
-                print('#' * 80)
-                print('press Ctrl+C to stop the recording')
-                print('#' * 80)
-                ani = FuncAnimation(fig, update_plot, interval=interval, blit=True)
+    # Make sure the file is opened before recording anything:
+    with sf.SoundFile(filename, mode='x', samplerate=samplerate,
+        channels=max(channels), subtype=subtype) as file:
+        with sd.InputStream(samplerate=samplerate,
+                            channels=max(channels), callback=audio_callback):
+            print('#' * 80)
+            print('press Ctrl+C to stop the recording')
+            print('#' * 80)
+
+            if args.showPlot == True:
+                while True:
+                    plt.plot()
+                    plt.draw()
+                    plt.pause(0.001)
+                    file.write(q.get())
+            else:
                 while True:
                     file.write(q.get())
-                    plt.show()
 
 except KeyboardInterrupt:
     print('\nRecording finished: ' + repr(filename))
+    exit(0)
 
 
