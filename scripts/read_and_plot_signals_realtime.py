@@ -20,7 +20,7 @@ samplerate = 8000
 device = 9
 channels = [1]
 subtype = 'PCM_16'
-filename = 'recordings/wingbeats_' + time.strftime('%D__%R').replace('/','_').replace(':','_') + '.wav'
+filename = 'recordings/wingbeats_' + time.strftime('%D__%T').replace('/','_').replace(':','_') + '.wav'
 
 # plot parameters
 downsample = 10
@@ -32,6 +32,7 @@ q = queue.Queue()
 # Do not show plot by default
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument('-sP', '--showPlot', type = bool, default = False)
+parser.add_argument('-d', '--duration', type = int, default = 0)
 args = parser.parse_args()
 
 def audio_callback(indata, frames, time, status):
@@ -64,7 +65,6 @@ def update_plot(frame):
         line.set_ydata(plotdata[:, column])
     return lines
 
-
 try:
     length = int(window * samplerate / (1000 * downsample))
     plotdata = np.zeros((length, len(channels)))
@@ -78,6 +78,7 @@ try:
                    right=False, left=False, labelleft=False)
     fig.tight_layout(pad=0)
     ani = FuncAnimation(fig, update_plot, interval=interval, blit=True)
+
 
     # Make sure the file is opened before recording anything:
     with sf.SoundFile(filename, mode='x', samplerate=samplerate,
