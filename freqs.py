@@ -3,6 +3,7 @@ import pandas as pd
 import random as rd
 import matplotlib.pyplot as plt
 import os
+import math
 
 class Freqs:
     def __init__(self, freqs, amount):
@@ -13,10 +14,10 @@ class Freqs:
         """Find number of peaks that have at least 'prop_max'% power"""
         freq_peaks = [sig.find_peaks(obs['power'],
                                      height = max(obs['power']) / prop_max)
-                      for obs in self.freqs]
+                      for obs in self.freqs]        
         return freq_peaks
 
-    def filter(self, key):
+    def filter_by(self, key):
         """Filter data by 'key'"""
         filtered_data = Freqs(self.data[key])
         return filtered_data
@@ -35,7 +36,7 @@ class Freqs:
             selection = range(num_plots)
 
         for i in range(len(selection)):
-            plt.subplot(num_plots/10, 10, i + 1)
+            plt.subplot(math.ceil(num_plots/10), 10, i + 1)
             plt.plot(self.freqs[selection[i]]['freq'],
                      self.freqs[selection[i]]['power'])
 

@@ -21,9 +21,9 @@ class Files:
         return file_names
 
     def obtain_wav_data(self,
+                        frequency,
                         amount = 0,
-                        random = False,
-                        frequency = 8000):
+                        random = False):
         # if no amount in chosen then grab all
         if amount == 0:
             amount = self.amount

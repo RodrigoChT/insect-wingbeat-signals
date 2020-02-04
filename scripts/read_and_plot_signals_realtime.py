@@ -15,25 +15,32 @@ assert np
 
 from matplotlib.animation import FuncAnimation
 
-# recording parameters (same freq and resolution as original paper)
-samplerate = 8000
-device = 9
-channels = [1]
-subtype = 'PCM_16'
-filename = 'recordings/wingbeats_' + time.strftime('%D__%T').replace('/','_').replace(':','_') + '.wav'
-
-# plot parameters
-downsample = 10
-interval = 20
-window = 200
-
-q = queue.Queue()
-
-# Do not show plot by default
+# Optional arguments
 parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('-n', '--name', type = str, default = '')
 parser.add_argument('-sP', '--showPlot', type = bool, default = False)
 parser.add_argument('-d', '--duration', type = int, default = 0)
 args = parser.parse_args()
+
+# recording parameters (same freq and resolution as original paper)
+samplerate = 44100 # change to match recording speed of device, but only need 8000
+device = 2
+channels = [1]
+subtype = 'PCM_16'
+recording_dir = 'recordings/sounds/'
+
+if args.name == '':
+    filename = recording_dir + 'wingbeats_' + time.strftime('%D__%T').replace('/','_').replace(':','_') + '.wav'
+else:
+    filename = recording_dir + args.name + '.wav'
+    
+# plot parameters
+downsample = 50
+interval = 20
+window = 200
+
+
+q = queue.Queue()
 
 def audio_callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
@@ -83,8 +90,10 @@ try:
     # Make sure the file is opened before recording anything:
     with sf.SoundFile(filename, mode='x', samplerate=samplerate,
         channels=max(channels), subtype=subtype) as file:
-        with sd.InputStream(samplerate=samplerate,
-                            channels=max(channels), callback=audio_callback):
+        with sd.InputStream(samplerate = samplerate,
+                            device = device,
+                            channels = max(channels),
+                            callback = audio_callback):
             print('#' * 80)
             print('press Ctrl+C to stop the recording')
             print('#' * 80)

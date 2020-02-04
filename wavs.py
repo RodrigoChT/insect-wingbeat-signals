@@ -1,5 +1,6 @@
 import scipy.signal as sig
 import pandas as pd
+import math
 
 from freqs import Freqs
 
@@ -9,6 +10,13 @@ class Wavs:
         self.frequency = frequency
         self.amount = amount
 
+    def downsample(self, obj_frequency):
+        """Downsample orginial data down to the 'obj_frequency'"""
+        self.wav_raw = [sig.decimate(wav,
+                                     math.floor(self.frequency / obj_frequency))
+                        for wav in self.wav_raw]
+        self.frequency = obj_frequency
+        
     def filter_data(self,
                     lowcut,
                     highcut,

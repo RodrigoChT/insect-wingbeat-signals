@@ -1,0 +1,6 @@
+Audio recording:
+    evaluate noise in final recording environment
+    
+Video recording:
+    force steady framerate (important for sync)
+    
