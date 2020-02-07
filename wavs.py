@@ -1,6 +1,7 @@
 import scipy.signal as sig
 import pandas as pd
 import math
+import numpy as np
 
 from freqs import Freqs
 
@@ -33,8 +34,32 @@ class Wavs:
         """Performn a Fourier Transform"""
         freq_data = [sig.welch(wav, self.frequency)
                      for wav in self.wav_filtered]
-        freq_data = Freqs([pd.DataFrame(data = dict(freq = obs[0],
-                                                    power = obs[1]))
-                           for obs in freq_data],
-                          self.amount)
-        return freq_data
+
+        # Check that frequencies buckets are the same across the data
+        if self.amount > 1:
+            all_equal = True
+            for i in range(1, self.amount):
+                all_equal = all_equal & np.array_equal(freq_data[i - 1][0],
+                                                       freq_data[i][0])
+                if all_equal == False:
+                    raise ValueError('Not all files have the same frequency buckets.')
+
+        freq_data_ins = Freqs([obs[1] for obs in freq_data],
+                              freq_data[0][0],
+                              self.amount)
+        return freq_data_ins
+
+
+        # freq_data = Freqs([pd.DataFrame(data=dict(freq=obs[0],
+        #                                           power=obs[1]))
+        #                    for obs in freq_data],
+        #                   self.amount)
+        # return freq_data
+
+        # freq_data = [sig.welch(wav, self.frequency)
+        #              for wav in self.wav_filtered]
+        # freq_data = Freqs([pd.DataFrame(data = dict(freq = obs[0],
+        #                                             power = obs[1]))
+        #                    for obs in freq_data],
+        #                   self.amount)
+        # return freq_data

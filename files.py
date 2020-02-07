@@ -37,7 +37,7 @@ class Files:
         wav_data = Wavs([sf.read(file_name)[0]
                          for file_name in selection],
                         frequency,
-                        self.amount)
+                        amount)
 
         return wav_data
 
