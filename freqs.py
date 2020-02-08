@@ -91,8 +91,8 @@ class Peaks:
             for j in range(2):
                 main_fqs = main_fqs + [obs[0]]
                 harmonics = (obs / obs[0]) % 1 # see how close they are multiples
-                #harmonics =
-                harmonics = [not abs(har - 1 for har in harmonics]  # todo: relax demand
+                harmonics = [min(a, 1 - a) < precision for a in harmonics] 
+                #harmonics = [not abs(har - 1 for har in harmonics]  # todo: relax demand
                 obs = list(itertools.compress(obs, harmonics))
                 if len(obs) == 0:
                     break

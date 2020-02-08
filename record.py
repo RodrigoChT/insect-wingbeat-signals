@@ -17,7 +17,7 @@ class VideoRecorder():
 
 		self.open = True
 		self.video_device_index = video_device_index
-		self.fps = 20
+		self.fps = 10
 		self.show_video = show_video
 		self.fourcc = "MJPG"
 		self.frameSize = (640, 480)
@@ -63,8 +63,8 @@ class VideoRecorder():
 
 	# Launches the video recording function using a thread
 	def start(self):
-		video_thread = threading.Thread(target=self.record)
-		video_thread.start()
+		self.record()
+		#video_thread.start()
 
 
 class AudioRecorder():

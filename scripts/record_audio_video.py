@@ -1,8 +1,8 @@
 import argparse
 import time
 
-from record import start_AVrecording
-from record import stop_AVrecording
+from record_testing import start_AVrecording
+from record_testing import stop_AVrecording
 
 # Script arguments
 parser = argparse.ArgumentParser(add_help=False)
@@ -26,12 +26,12 @@ for i in range(args.repetitions):
 
 
     start_AVrecording(file_name = current_file_name,
-                      video_device_index = 0,
-                      audio_device_index = 16,
+                      video_device_index = -1, # 0 for laptop
+                      audio_device_index = 0, # 16 for laptop
                       show_video = args.showVideo,
                       audio_directory = args.audioDirectory,
                       video_directory = args.videoDirectory,
-                      rate = 8000)
+                      rate = 44100) # 8000 for laptop
 
     time.sleep(args.duration)
 
