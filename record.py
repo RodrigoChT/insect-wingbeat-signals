@@ -85,6 +85,7 @@ class AudioRecorder():
 		if status:
 			print(status, file=sys.stderr)
 		self.q.put(indata.copy())
+		#self.q.put(indata[::downsample, mapping])
 
 	def record(self):
 		# Make sure the file is opened before recording anything:

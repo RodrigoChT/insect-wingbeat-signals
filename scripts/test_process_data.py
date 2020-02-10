@@ -13,5 +13,11 @@ peaks2 = peaks.filter_by(filt2)
 #print(peaks1.peaks_index)
 #print(peaks2.peaks_index)
 
-peaks.ignore_peak_harmonics(3)
+peaks_non_harm = peaks.ignore_peak_harmonics(0)
+peaks_non_harm_greater_1 = peaks_non_harm.check_if_max_amount(1)
+peaks_filt_non_harm = peaks_non_harm.filter_by(peaks_non_harm_greater_1)
+freqs_filt_non_harm = c.filter_by(peaks_non_harm_greater_1)
+
+print(peaks_non_harm_greater_1)
+print(freqs_filt_non_harm.amount)
 #c.plot(num_plots=30, save = True, file_name='test2', show=False)

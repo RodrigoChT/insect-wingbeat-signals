@@ -23,38 +23,45 @@ class Freqs:
                       for obs in self.power]
         return Peaks(peaks_index, self.freqs)
 
-    # def filter_by(self, key):
-    #     """Filter data by 'key'"""
-    #     filtered_data = Freqs(self.data[key])
-    #     return filtered_data
-    #
-    # # todo: store plots in better resolution
-    # def plot(self,
-    #          num_plots = 20,
-    #          random = False,
-    #          save = False,
-    #          file_name = 'temp',
-    #          show = True):
-    #     """Plot frequencies in multiples of 10 observations"""
-    #     if random:
-    #         selection = rd.sample(range(self.amount), num_plots)
-    #     else:
-    #         selection = range(num_plots)
-    #
-    #     for i in range(len(selection)):
-    #         plt.subplot(math.ceil(num_plots/10), 10, i + 1)
-    #         plt.plot(self.freqs[selection[i]]['freq'],
-    #                  self.freqs[selection[i]]['power'])
-    #
-    #     if save:
-    #         full_file_name = os.path.join('./plots', file_name + '.png')
-    #         if os.path.exists(full_file_name):
-    #             raise ValueError('File name for plot already exists.')
-    #         else:
-    #            plt.savefig(full_file_name)
-    #
-    #     if show:
-    #         plt.show()
+    def filter_by(self, key, invert = False):
+        """Filter data by 'key'"""
+        if invert:
+            key = np.invert(key)
+        filtered_data = list(itertools.compress(self.power, key))
+        return Freqs(filtered_data,
+                     self.freqs,
+                     len(filtered_data))
+
+    # todo: store plots in better resolution
+    def plot(self,
+             num_plots = 20,
+             random = False,
+             save = False,
+             file_name = 'temp',
+             show = True):
+        """Plot frequencies in multiples of 10 observations"""
+        num_plots = min(num_plots, self.amount)
+
+        if random:
+            selection = rd.sample(range(self.amount), num_plots)
+        else:
+            selection = range(num_plots)
+
+
+        for i in range(len(selection)):
+            plt.subplot(math.ceil(num_plots/10), 10, i + 1)
+            plt.plot(self.freqs,
+                     self.power[selection[i]])
+
+        if save:
+            full_file_name = os.path.join('./plots', file_name + '.png')
+            if os.path.exists(full_file_name):
+                raise ValueError('File name for plot already exists.')
+            else:
+               plt.savefig(full_file_name)
+
+        if show:
+            plt.show()
 
 class Peaks:
     def __init__(self,
@@ -82,27 +89,31 @@ class Peaks:
     # todo: do not jump from x1 to x3?
     # todo: exclude peaks of very low frequencies
     def ignore_peak_harmonics(self, precision):
-        """Remove peaks that are harmonics of the first 2 peaks"""
-        results = []
+        """Remove peaks that are harmonics of the first 2 peaks.
+        'precision' = [0 to 1]"""
+        peaks = []
+        print(self.peaks_index)
         for i in range(self.amount):
             obs = self.freqs[self.peaks_index[i]]
             print(obs)
             main_fqs = []
-            for j in range(2):
+            for j in range(min(2, len(obs))):
                 main_fqs = main_fqs + [obs[0]]
                 harmonics = (obs / obs[0]) % 1 # see how close they are multiples
-                harmonics = [min(a, 1 - a) < precision for a in harmonics] 
-                #harmonics = [not abs(har - 1 for har in harmonics]  # todo: relax demand
+                harmonics = [not(min(a, 1 - a) <= precision) for a in harmonics]
                 obs = list(itertools.compress(obs, harmonics))
                 if len(obs) == 0:
                     break
             main_fqs = main_fqs + obs
             main_fqs.sort()
-            results.append(main_fqs)
-        print(results)
-        return results
+            main_fqs = np.in1d(self.freqs, main_fqs)
+            peaks.append(np.nonzero(main_fqs)[0])
+        print(peaks)
+        return Peaks(peaks, self.freqs)
 
-    def filter_by(self, key):
+    def filter_by(self, key, invert = False):
         """Filter data by 'key'"""
+        if invert:
+            key = np.invert(key)
         filtered_peaks_index = list(itertools.compress(self.peaks_index, key))
         return Peaks(filtered_peaks_index, self.freqs)
