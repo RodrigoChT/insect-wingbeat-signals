@@ -1,6 +1,0 @@
-Audio recording:
-	evaluate noise in final recording environment
-    
-Video recording:
-	option to not show video (buggy)
-    

@@ -1,5 +1,4 @@
 import scipy.signal as sig
-import pandas as pd
 import math
 import numpy as np
 
@@ -30,8 +29,8 @@ class Wavs:
         self.wav_filtered = [sig.lfilter(b, a, wav)
                          for wav in self.wav_raw]
 
-    def perform_fourier_transform(self):
-        """Performn a Fourier Transform"""
+    def perform_PSD(self):
+        """Performn a Power Spectral Decomposition"""
         freq_data = [sig.welch(wav, self.frequency)
                      for wav in self.wav_filtered]
 
@@ -48,18 +47,3 @@ class Wavs:
                               freq_data[0][0],
                               self.amount)
         return freq_data_ins
-
-
-        # freq_data = Freqs([pd.DataFrame(data=dict(freq=obs[0],
-        #                                           power=obs[1]))
-        #                    for obs in freq_data],
-        #                   self.amount)
-        # return freq_data
-
-        # freq_data = [sig.welch(wav, self.frequency)
-        #              for wav in self.wav_filtered]
-        # freq_data = Freqs([pd.DataFrame(data = dict(freq = obs[0],
-        #                                             power = obs[1]))
-        #                    for obs in freq_data],
-        #                   self.amount)
-        # return freq_data
