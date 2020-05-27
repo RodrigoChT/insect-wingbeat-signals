@@ -7,17 +7,21 @@ import itertools
 from files import Files
 
 #### Parameters
-# select insect species
-amount_per_insect = 0 # 0 will grab all available data
-num_plots = 200 # 0 will draw no plots
-max_peaks = 3 # 3 for flies, 4 for mosquitoes
-freq_range = [160, 600] # 160-600 for flies, 400-1000 for mosquitoes
-record_freq = 8000
-freq_filter = [75, 1000]
-random_files_plotted = False # if true, before drawing the plots the files will be shuffled
-insect_dirs_path = '/home/rodrigo/Documents/data/suzukii'
-plots_path = '/home/rodrigo/Documents/plots_test'
-results_path = '/home/rodrigo/Documents/results_test'
+# file paths
+insect_dirs_path = '' # directory that contains 1 directory per insect species. The wav files can be arranged in lower
+                      # directories that can be shared with other file types.
+plots_path = '' # single directory where all the plots will be stored
+results_path = '' # single directory where the lists of selected and discarded wav file names will be stored
+
+# processing settings
+amount_per_insect = 0 # how many wav files to process per species, 0 will grab all available data
+num_plots = 200 # how many plots to draw per species, 0 will draw no plots
+random_files_plotted = False # if True, then a random subset of signals plots will be drawn. If False, the first set
+                             # of signals will be drawn
+max_peaks = 3 # max amount of peaks to still consider valid observation (3 for flies, 4 for mosquitoes)
+freq_range = [160, 600] # valid frequency rate (160-600 for flies, 400-1000 for mosquitoes)
+record_freq = 8000 # record frequency
+freq_filter = [75, 1000] # range of Butterworth passband filter
 
 #### Script
 
